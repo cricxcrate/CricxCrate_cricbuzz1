@@ -1,16 +1,17 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>CricxCrate – Live Cricket</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- SHAKA PLAYER -->
+<!-- SHAKA PLAYER (for MPD + DRM) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.9/shaka-player.compiled.js"></script>
 
 <style>
 *{box-sizing:border-box}
 
+/* BASE LIGHT THEME */
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
@@ -18,21 +19,24 @@ body{
   color:#111827;
   user-select:none;
 }
-
 iframe{border:none}
 
+/* BLUR WHEN POPUP (but allow video interactions) */
 body.popup-active .main-content > :not(.player-wrap){
   filter:blur(6px);
   pointer-events:none;
 }
 
+/* GLASS CARDS */
 .glass{
   background:rgba(255,255,255,.72);
   backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
   border:1px solid rgba(255,255,255,.45);
   box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
+/* TOP BAR */
 .top-bar{
   max-width:950px;
   margin:14px auto;
@@ -42,6 +46,7 @@ body.popup-active .main-content > :not(.player-wrap){
   border-radius:18px;
 }
 
+/* PLAYER */
 .player-wrap{
   max-width:950px;
   margin:0 auto;
@@ -50,17 +55,20 @@ body.popup-active .main-content > :not(.player-wrap){
   overflow:hidden;
   box-shadow:0 14px 30px rgba(0,0,0,.15);
 }
-
 .player-wrap video{
   width:100%;
   height:55vh;
   background:#000;
 }
 
+/* MOBILE VIDEO HEIGHT */
 @media(max-width:768px){
-  .player-wrap video{height:42vh;}
+  .player-wrap video{
+    height:42vh;
+  }
 }
 
+/* SECTIONS */
 .section{
   max-width:950px;
   margin:14px auto;
@@ -71,7 +79,6 @@ body.popup-active .main-content > :not(.player-wrap){
   justify-content:center;
   flex-wrap:wrap;
 }
-
 .section h3{
   width:100%;
   text-align:center;
@@ -80,6 +87,7 @@ body.popup-active .main-content > :not(.player-wrap){
   font-weight:600;
 }
 
+/* BUTTONS */
 .btn{
   background:rgba(255,255,255,.9);
   color:#FF6B6B;
@@ -91,19 +99,20 @@ body.popup-active .main-content > :not(.player-wrap){
   text-decoration:none;
   box-shadow:0 6px 14px rgba(0,0,0,.08);
 }
-
 .btn.primary{
   background:#FF6B6B;
   color:#fff;
   border:none;
 }
 
+/* TAP FEEDBACK */
 .btn:active,
 .popup-box a:active,
 .popup-box button:active{
   transform:scale(.96);
 }
 
+/* BANNER */
 .banner{
   max-width:950px;
   margin:20px auto;
@@ -116,9 +125,9 @@ body.popup-active .main-content > :not(.player-wrap){
   font-weight:600;
   border-radius:22px;
 }
-
 .banner img{width:36px}
 
+/* POPUP */
 .popup{
   position:fixed;
   inset:0;
@@ -129,7 +138,6 @@ body.popup-active .main-content > :not(.player-wrap){
   justify-content:center;
   z-index:999;
 }
-
 .popup-box{
   background:rgba(255,255,255,.75);
   backdrop-filter:blur(18px);
@@ -141,10 +149,8 @@ body.popup-active .main-content > :not(.player-wrap){
   border:1px solid rgba(255,255,255,.5);
   box-shadow:0 25px 50px rgba(0,0,0,.2);
 }
-
 .popup-box h2{margin:0 0 8px}
 .popup-box p{margin:0 0 18px;color:#6b7280}
-
 .popup-box a,
 .popup-box button{
   display:block;
@@ -157,9 +163,14 @@ body.popup-active .main-content > :not(.player-wrap){
   cursor:pointer;
   text-decoration:none;
 }
-
-.popup-join{background:#FF6B6B;color:#fff}
-.popup-done{background:rgba(255,255,255,.9);color:#FF6B6B}
+.popup-join{
+  background:#FF6B6B;
+  color:#fff;
+}
+.popup-done{
+  background:rgba(255,255,255,.9);
+  color:#FF6B6B;
+}
 </style>
 </head>
 
@@ -175,16 +186,18 @@ body.popup-active .main-content > :not(.player-wrap){
   </div>
 </div>
 
+<!-- MAIN CONTENT -->
 <div class="main-content">
 
-  <div class="top-bar glass">CricxCrate • Cricbuzz 1</div>
+  <div class="top-bar glass">CricxCrate • Cricbuzz</div>
 
+  <!-- NEW DASH PLAYER -->
   <div class="player-wrap">
     <video id="video" controls autoplay playsinline></video>
-  </div>
 
-  <div class="section glass">
-    <h3>⚡ Join Telegram For Live Updates</h3>
+    </div>
+<div class="section glass">
+    <h3>⚡️ Join Telegram For Live Updates</h3>
     <a class="btn primary" href="https://t.me/CricxCrate" target="_blank">Join Telegram</a>
     <a class="btn" href="https://t.me/CricxCratelinks" target="_blank">All Channels</a>
   </div>
@@ -207,7 +220,7 @@ body.popup-active .main-content > :not(.player-wrap){
 <script>
 const popup = document.getElementById("popup");
 
-/* Share + Copy */
+/* SHARE & COPY */
 function copyLink(){
   navigator.clipboard.writeText(location.href);
   alert("Link copied!");
@@ -219,11 +232,14 @@ function sharePage(){
   }
 }
 
-/* Popup */
+/* POPUP */
 function closePopup(){
-  popup.style.display = "none";
-  document.body.classList.remove("popup-active");
-  sessionStorage.setItem("joined","yes");
+  popup.style.opacity = "0";
+  setTimeout(() => {
+    popup.style.display = "none";
+    document.body.classList.remove("popup-active");
+    sessionStorage.setItem("joined","yes");
+  }, 300);
 }
 
 if(sessionStorage.getItem("joined") !== "yes"){
@@ -232,7 +248,9 @@ if(sessionStorage.getItem("joined") !== "yes"){
   popup.style.display = "none";
 }
 
-/* Shaka Player */
+/* =========================
+   SHAKA PLAYER (MPD + KEY)
+   ========================= */
 async function initPlayer(){
   const video = document.getElementById('video');
   const player = new shaka.Player(video);
@@ -241,14 +259,14 @@ async function initPlayer(){
     await player.configure({
       drm:{
         clearKeys:{
-          "48bef83b4c6a3c5189b01b0126210da4":
-          "bd085230b7b09e50954fe0af111a8a9f"
+        "48bef83b4c6a3c5189b01b0126210da4"
+:"bd085230b7b09e50954fe0af111a8a9f"
         }
       }
     });
 
     await player.load(
-      "https://ev-fast-mpd.starzplayarabia.com/live/eds/Criclife_3/DASH/Criclife_3.mpd"
+      "https://ev-fast-mpd.starzplayarabia.com/live/eds/CricLife2/DASH/CricLife2.mpd"
     );
 
     console.log("Stream loaded");
